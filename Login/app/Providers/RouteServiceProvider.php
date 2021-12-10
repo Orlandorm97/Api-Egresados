@@ -16,7 +16,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * This is used by Laravel authentication to redirect users after login.
      *
-     * @var string
+     * 
      */
 
     //public const HOME = '/home';
@@ -38,8 +38,8 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string|null
      */
-    // protected $namespace = 'App\\Http\\Controllers';
-
+    
+    //protected $namespace = 'App\Http\Controllers';
     /**
      * Define your route model bindings, pattern filters, etc.
      *
@@ -48,21 +48,30 @@ class RouteServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->configureRateLimiting();
-
-        $this->routes(function () {
-            Route::prefix('api')
-                ->middleware('api')
-                ->namespace($this->namespace)
-                ->group(base_path('routes/api.php'));
-
-            Route::middleware('web')
-                ->namespace($this->namespace)
-                ->group(base_path('routes/web.php'));
-
-            Route::middleware('web','auth') //solo se ve esta ruta si estas autenticado
-                ->namespace($this->namespace)
-                ->group(base_path('routes/admin.php')); //define las rutas de admin.php
-        });
+        
+    }
+    
+    public function map(){
+        $this -> mapApiRoutes();
+        $this -> mapWebRoutes();
+    }
+    
+    protected function mapApiRoutes(){
+        Route::prefix('api')
+        ->middleware('api')
+        ->namespace($this->namespace)
+        ->group(base_path('routes/api.php'));
+        
+    }
+    
+    protected function mapWebRoutes(){
+        Route::middleware('web')
+        ->namespace($this->namespace)
+        ->group(base_path('routes/web.php'));
+        
+        Route::middleware('web','auth') //solo se ve esta ruta si estas autenticado
+        ->namespace($this->namespace)
+        ->group(base_path('routes/admin.php')); //define las rutas de admin.php
     }
 
     /**
@@ -73,7 +82,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function configureRateLimiting()
     {
         RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by(optional($request->user())->id ?: $request->ip());
+            return Limit::perMinute(1000)->by(optional($request->user())->id ?: $request->ip());
         });
     }
 }
